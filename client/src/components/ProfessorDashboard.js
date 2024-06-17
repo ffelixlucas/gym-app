@@ -4,18 +4,32 @@ import './ProfessorDashboard.css';
 const ProfessorDashboard = ({ alunos, setAlunos, onLogout }) => {
   const [mostrarFormularioAluno, setMostrarFormularioAluno] = useState(false);
   const [mostrarFormularioTreino, setMostrarFormularioTreino] = useState(false);
-  const [novoAluno, setNovoAluno] = useState({ nome: '', senha: '', treino: '' });
-  const [novoTreino, setNovoTreino] = useState({ aluno: '', descricao: '' });
+  const [novoAluno, setNovoAluno] = useState({ nome: '', senha: '', treino: { A: [], B: [], C: [], D: [], E: [] } });
+  const [novoTreino, setNovoTreino] = useState({
+    aluno: '',
+    formato: 'AB',
+    treinos: { A: [], B: [], C: [], D: [], E: [] }, 
+  });
+  const [novoMovimento, setNovoMovimento] = useState({ nome: '', repeticoes: '', obs: '' });
   const [mostrarListaAlunos, setMostrarListaAlunos] = useState(false);
   const [busca, setBusca] = useState('');
 
+  // Função para adicionar um novo aluno
   const handleAdicionarAluno = (event) => {
     event.preventDefault();
+
+    // Validação básica dos campos
+    if (novoAluno.nome.trim() === '' || novoAluno.senha.trim() === '') {
+      alert('Por favor, preencha todos os campos.');
+      return;
+    }
+
     setAlunos([...alunos, novoAluno]);
-    setNovoAluno({ nome: '', senha: '', treino: '' });
+    setNovoAluno({ nome: '', senha: '', treino: { A: [], B: [], C: [], D: [], E: [] } });
     setMostrarFormularioAluno(false);
   };
 
+  // Função para adicionar um novo treino
   const handleAdicionarTreino = (event) => {
     event.preventDefault();
 
@@ -23,16 +37,40 @@ const ProfessorDashboard = ({ alunos, setAlunos, onLogout }) => {
 
     if (alunoIndex !== -1) {
       const novosAlunos = [...alunos];
-      novosAlunos[alunoIndex].treino = novoTreino.descricao;
+      novosAlunos[alunoIndex].treino = novoTreino.treinos;
       setAlunos(novosAlunos);
     } else {
       alert('Por favor, selecione um aluno.');
     }
 
-    setNovoTreino({ aluno: '', descricao: '' });
+    setNovoTreino({ aluno: '', formato: 'AB', treinos: { A: [], B: [], C: [], D: [], E: [] } });
     setMostrarFormularioTreino(false);
   };
 
+  // Função para adicionar um novo movimento ao treino
+  const handleAdicionarMovimento = (dia) => {
+    setNovoTreino(prevTreino => ({
+      ...prevTreino,
+      treinos: {
+        ...prevTreino.treinos,
+        [dia]: [...prevTreino.treinos[dia], novoMovimento]
+      }
+    }));
+    setNovoMovimento({ nome: '', repeticoes: '', obs: '' });
+  };
+
+  // Função para remover um movimento do treino
+  const handleRemoverMovimento = (dia, index) => {
+    setNovoTreino(prevTreino => ({
+      ...prevTreino,
+      treinos: {
+        ...prevTreino.treinos,
+        [dia]: prevTreino.treinos[dia].filter((_, i) => i !== index)
+      }
+    }));
+  };
+
+  // Função para excluir um aluno
   const handleExcluirAluno = (alunoNome) => {
     if (window.confirm(`Deseja mesmo excluir o aluno ${alunoNome}?`)) {
       setAlunos(alunos.filter(aluno => aluno.nome !== alunoNome));
@@ -42,6 +80,7 @@ const ProfessorDashboard = ({ alunos, setAlunos, onLogout }) => {
   const alunosFiltrados = alunos.filter(aluno =>
     aluno.nome.toLowerCase().includes(busca.toLowerCase())
   );
+
 
   return (
     <div className="professor-dashboard">
@@ -73,11 +112,6 @@ const ProfessorDashboard = ({ alunos, setAlunos, onLogout }) => {
               </li>
             ))}
           </ul>
-          <button onClick={() => {
-            setMostrarFormularioAluno(true);
-            setMostrarListaAlunos(false); 
-          }}>Adicionar Aluno +</button>
-
           <button type="button" onClick={() => setMostrarListaAlunos(false)}>Voltar</button> 
         </div>
       )}
@@ -101,7 +135,7 @@ const ProfessorDashboard = ({ alunos, setAlunos, onLogout }) => {
 
       {/* Formulário de adicionar treino */}
       {mostrarFormularioTreino && (
-        <form onSubmit={handleAdicionarTreino}>
+        <form onSubmit={handleAdicionarTreino}> {/* Início do form */}
           <h2>Adicionar Treino</h2>
           <label htmlFor="aluno">Aluno:</label>
           <select id="aluno" value={novoTreino.aluno} onChange={(e) => setNovoTreino({ ...novoTreino, aluno: e.target.value })}>
@@ -111,14 +145,41 @@ const ProfessorDashboard = ({ alunos, setAlunos, onLogout }) => {
             ))}
           </select>
 
-          <label htmlFor="descricao">Descrição do Treino:</label>
-          <textarea id="descricao" value={novoTreino.descricao} onChange={(e) => setNovoTreino({ ...novoTreino, descricao: e.target.value })} />
+          {/* Tabela para adicionar movimentos */}
+          <table>
+            <thead>
+              <tr>
+                <th>Movimento</th>
+                <th>Repetições</th>
+                <th>Observações</th>
+                <th>Ações</th> 
+              </tr>
+            </thead>
+            <tbody>
+              {novoTreino.treinos[novoTreino.formato[0]].map((movimento, index) => (
+                <tr key={index}>
+                  <td>{movimento.nome}</td>
+                  <td>{movimento.repeticoes}</td>
+                  <td>{movimento.obs}</td>
+                  <td>
+                    <button type="button" onClick={() => handleRemoverMovimento(novoTreino.formato[0], index)}>Remover</button>
+                  </td>
+                </tr>
+              ))}
+              <tr> {/* Linha para adicionar novo movimento */}
+                <td><input type="text" value={novoMovimento.nome} onChange={(e) => setNovoMovimento({ ...novoMovimento, nome: e.target.value })} /></td>
+                <td><input type="text" value={novoMovimento.repeticoes} onChange={(e) => setNovoMovimento({ ...novoMovimento, repeticoes: e.target.value })} /></td>
+                <td><input type="text" value={novoMovimento.obs} onChange={(e) => setNovoMovimento({ ...novoMovimento, obs: e.target.value })} /></td>
+                <td><button type="button" onClick={() => handleAdicionarMovimento(novoTreino.formato[0])}>Adicionar</button></td>
+              </tr>
+            </tbody>
+          </table>
 
           <div className="form-buttons">
             <button type="submit">Adicionar Treino</button>
             <button type="button" onClick={() => setMostrarFormularioTreino(false)}>Voltar</button>
           </div>
-        </form>
+        </form> /* Fechamento da tag form */
       )}
     </div>
   );
