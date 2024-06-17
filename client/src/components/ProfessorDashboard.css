@@ -1,0 +1,96 @@
+.professor-dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* Estilos para todos os botões */
+.professor-dashboard button {
+  width: 170px;
+  height: 40px;
+  padding: 10px 20px; /* Ajuste o padding para o tamanho desejado */
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 10px; /* Adiciona um espaçamento entre os botões */
+}
+
+.professor-dashboard button:hover {
+  background-color: #45a049;
+}
+
+/* Container para os botões principais */
+.button-container {
+  display: flex;
+  flex-direction: column; /* Botões em coluna */
+  align-items: center;
+  gap: 15px;
+}
+.button-excluir {
+  background-color: #da190b;
+}
+
+/* Estilos para os formulários */
+form {
+  display: flex;
+  flex-direction: column;
+  width: 350px;
+  padding: 20px;
+  border: 0px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
+}
+form h2 { /* Centraliza o título do formulário */
+  text-align: center;
+}
+
+form label { /* Alinha os labels à esquerda */
+  text-align: left;
+}
+label{
+  padding: 5px;
+}
+/* Estilos para os campos dos formulários */
+form input[type="text"],
+form input[type="password"],
+form textarea,
+form select {
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  /* Faz com que os inputs ocupem toda a largura do formulário */
+}
+
+/* Container para os botões dos formulários (horizontal) */
+.form-buttons {
+  display: flex;
+  justify-content: space-around; /* Distribui os botões uniformemente */
+}
+
+/* Estilos para a lista de alunos */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+li button {
+  background-color: #f44336;
+}
+
+li button:hover {
+  background-color: #da190b;
+}
